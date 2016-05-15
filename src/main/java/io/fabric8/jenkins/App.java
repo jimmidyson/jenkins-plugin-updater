@@ -1,6 +1,7 @@
 package io.fabric8.jenkins;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -15,22 +16,22 @@ import java.util.*;
 public class App {
     public static void main(String[] args) throws Exception {
 
+        String pluginsUrl = args[0];
+        if (StringUtils.isEmpty(pluginsUrl)){
+            throw new Exception("No plugins.txt URL found.  Please pass URL as -D arg.");
+        }
+
+        String pluginsTxt = IOUtils.toString(new URL(pluginsUrl), Charset.forName("UTF-8"));
+        if (StringUtils.isEmpty(pluginsUrl)){
+            throw new Exception("No plugins.txt content found at " + pluginsUrl);
+        }
+
         String txt = IOUtils.toString(new URL("http://ftp.icm.edu.pl/packages/jenkins/updates/current/update-center.json"), Charset.forName("UTF-8"));
         txt = txt.substring(19);
         JSONObject jenkinsUpdateJson = new JSONObject(txt);
 
-        if (jenkinsUpdateJson == null) {
-            throw new Exception("No update JSON found");
-        }
+        File file = new File(pluginsTxt);
 
-        ClassLoader classLoader = App.class.getClassLoader();
-        URL url = classLoader.getResource("plugins.txt");
-        if (url == null) {
-            throw new Exception("No plugins.txt file found in src/main/resources");
-        }
-        File file = new File(url.getFile());
-
-        StringBuilder result = new StringBuilder("");
         Map<String, String> plugins = new TreeMap<String, String>();
         try (Scanner scanner = new Scanner(file)) {
 
