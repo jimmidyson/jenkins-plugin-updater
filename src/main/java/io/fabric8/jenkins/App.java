@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -22,7 +23,7 @@ public class App {
         }
 
         String pluginsTxt = IOUtils.toString(new URL(pluginsUrl), Charset.forName("UTF-8"));
-        if (StringUtils.isEmpty(pluginsUrl)){
+        if (StringUtils.isEmpty(pluginsTxt)){
             throw new Exception("No plugins.txt content found at " + pluginsUrl);
         }
 
@@ -30,10 +31,8 @@ public class App {
         txt = txt.substring(19);
         JSONObject jenkinsUpdateJson = new JSONObject(txt);
 
-        File file = new File(pluginsTxt);
-
         Map<String, String> plugins = new TreeMap<String, String>();
-        try (Scanner scanner = new Scanner(file)) {
+        try (Scanner scanner = new Scanner(new StringReader(pluginsTxt))) {
 
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -46,10 +45,6 @@ public class App {
 
             }
 
-            scanner.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         Iterator it = plugins.entrySet().iterator();
