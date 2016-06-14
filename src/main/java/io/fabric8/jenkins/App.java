@@ -35,7 +35,10 @@ public class App {
         try (Scanner scanner = new Scanner(new StringReader(pluginsTxt))) {
 
             while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
+                String line = scanner.nextLine().trim();;
+                if (line.isEmpty() || line.startsWith("#")) {
+                  continue;
+                }
 
                 String[] split = line.split(":");
 
